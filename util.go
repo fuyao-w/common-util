@@ -60,3 +60,14 @@ func Ptr[T any](t T) *T {
 func Zero[T any]() (zero T) {
 	return zero
 }
+
+type Tuple[T1 any, T2 any] struct {
+	A T1
+	B T2
+}
+
+func BuildTuple[T1 any, T2 any](a T1, b T2) Tuple[T1, T2] {
+	return Tuple[T1, T2]{
+		A: a, B: b,
+	}
+}
