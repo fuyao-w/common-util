@@ -1,11 +1,13 @@
 package common_util
 
-import "sync"
+import (
+	sync "github.com/sasha-s/go-deadlock"
+)
 
 // LockItem 通过锁保护 item 的 访问
 type LockItem[T any] struct {
 	item T
-	lock sync.Mutex
+	lock *sync.Mutex
 }
 
 // Lock 获取锁的同时返回保护值的指针
@@ -28,6 +30,7 @@ func NewLockItem[T any](t ...T) *LockItem[T] {
 			}
 			return Zero[T]()
 		}(),
+		lock: new(sync.Mutex),
 	}
 }
 
@@ -39,15 +42,15 @@ func (s *LockItem[T]) Action(act func(t *T)) {
 
 // Get 获取内容
 func (s *LockItem[T]) Get() T {
-	s.lock.Lock()
 	defer s.lock.Unlock()
+	s.lock.Lock()
 	return s.item
 }
 
 // Set 设置内容
 func (s *LockItem[T]) Set(t T) {
-	s.lock.Lock()
 	defer s.lock.Unlock()
+	s.lock.Lock()
 	s.item = t
 }
 
