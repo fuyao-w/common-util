@@ -2,6 +2,7 @@ package common_util
 
 import (
 	sync "github.com/sasha-s/go-deadlock"
+	"sync/atomic"
 )
 
 // LockItem 通过锁保护 item 的 访问
@@ -73,4 +74,26 @@ func BuildTuple[T1 any, T2 any](a T1, b T2) Tuple[T1, T2] {
 	return Tuple[T1, T2]{
 		A: a, B: b,
 	}
+}
+
+type AtomicVal[T any] struct {
+	v atomic.Value
+}
+
+func NewAtomicVal[T any](val ...T) *AtomicVal[T] {
+	v := &AtomicVal[T]{}
+	if len(val) > 0 {
+		v.Store(val[0])
+	}
+	return v
+}
+func (a *AtomicVal[T]) Load() T {
+	val, ok := a.v.Load().(T)
+	if ok {
+		return val
+	}
+	return Zero[T]()
+}
+func (a *AtomicVal[T]) Store(t T) {
+	a.v.Store(t)
 }
